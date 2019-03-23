@@ -20,7 +20,7 @@ func (s *Symbol) IsTerminal() bool {
 	return s.isTerminal
 }
 
-func (s Symbol) String() string {
+func (s *Symbol) String() string {
 	var str string
 	if s.isTerminal {
 		str += "\"" + s.Id + "\""
