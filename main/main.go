@@ -16,8 +16,6 @@ func doExp() {
 
 	exp := dsl.NewSymbol("EXP")
 
-	lparen := dsl.NewSymbol("(")
-	rparen := dsl.NewSymbol(")")
 	plus := dsl.NewSymbol("+")
 	mult := dsl.NewSymbol("*")
 	c1 := dsl.NewSymbol("1")
@@ -27,9 +25,8 @@ func doExp() {
 
 	gram := dsl.NewGrammar(S)
 	gram.AddRule(S, exp)
-	gram.AddRule(exp, lparen, exp, rparen)
-	gram.AddRule(exp, exp, plus, exp)
-	gram.AddRule(exp, exp, mult, exp)
+	gram.AddRule(exp, plus, exp, exp)
+	gram.AddRule(exp, mult, exp, exp)
 	gram.AddRule(exp, c1)
 	gram.AddRule(exp, c2)
 	gram.AddRule(exp, c3)
@@ -40,10 +37,7 @@ func doExp() {
 	nodeS := dsl.NewAstNode(S)
 	nodeE1 := dsl.NewAstNode(exp)
 	nodeE2 := dsl.NewAstNode(exp)
-	nodeE3 := dsl.NewAstNode(exp)
 
-	nodeLparen := dsl.NewAstNode(lparen)
-	nodeRparen := dsl.NewAstNode(rparen)
 	nodePlus := dsl.NewAstNode(plus)
 	nodeMult := dsl.NewAstNode(mult)
 
@@ -52,9 +46,8 @@ func doExp() {
 	nodeC4 := dsl.NewAstNode(c4)
 
 	nodeS.AddChildren(nodeE1)
-	nodeE1.AddChildren(nodeE2, nodeMult, nodeC3)
-	nodeE2.AddChildren(nodeLparen, nodeE3, nodeRparen)
-	nodeE3.AddChildren(nodeC4, nodePlus, nodeC1)
+	nodeE1.AddChildren(nodeMult, nodeE2, nodeC3)
+	nodeE2.AddChildren(nodePlus, nodeC4, nodeC1)
 
 	fmt.Println(nodeS.String())
 	fmt.Println(nodeS.FormattedString())

@@ -7,19 +7,16 @@ import (
 func TestSymbol_String_01(t *testing.T) {
 	S := NewSymbol("S")
 	exp := NewSymbol("EXP")
-	lparen := NewSymbol("(")
-	rparen := NewSymbol(")")
 	plus := NewSymbol("+")
 	mult := NewSymbol("*")
 	gram := NewGrammar(S)
 	gram.AddRule(S, exp)
-	gram.AddRule(exp, lparen, exp, rparen)
 	gram.AddRule(exp, exp, plus, exp)
 	gram.AddRule(exp, exp, mult, exp)
 
 	t.Run("test the symbols", func(t *testing.T) {
 		got := len(gram.symbols.symbols)
-		want := 6
+		want := 4
 		if got != want {
 			t.Errorf("the number of sumbols is incorrect. got=%d, want=%d", got, want)
 		}
@@ -35,7 +32,7 @@ func TestSymbol_String_01(t *testing.T) {
 				gotNonTerminalCnt++
 			}
 		}
-		wantTreminalCnt := 4
+		wantTreminalCnt := 2
 		if gotTreminalCnt != wantTreminalCnt {
 			t.Errorf("the number of isTerminal is incorrect. got=%d, want=%d", gotTreminalCnt, wantTreminalCnt)
 		}
