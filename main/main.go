@@ -7,7 +7,26 @@ import (
 )
 
 func main() {
-	doSQL()
+	doExp()
+}
+
+func doExp() {
+	S := grammar.NewSymbol("S")
+
+	exp := grammar.NewSymbol("EXP")
+
+	lparen := grammar.NewSymbol("(")
+	rparen := grammar.NewSymbol(")")
+	plus := grammar.NewSymbol("+")
+	mult := grammar.NewSymbol("*")
+
+	gram := grammar.NewGrammar(S)
+	gram.AddRule(S, exp)
+	gram.AddRule(exp, lparen, exp, rparen)
+	gram.AddRule(exp, exp, plus, exp)
+	gram.AddRule(exp, exp, mult, exp)
+
+	fmt.Println(gram)
 }
 
 func doSQL() {
