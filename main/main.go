@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/KeitaTakenouchi/grammars/grammar"
+	"github.com/KeitaTakenouchi/grammars/dsl"
 )
 
 func main() {
@@ -12,16 +12,16 @@ func main() {
 }
 
 func doExp() {
-	S := grammar.NewSymbol("S")
+	S := dsl.NewSymbol("S")
 
-	exp := grammar.NewSymbol("EXP")
+	exp := dsl.NewSymbol("EXP")
 
-	lparen := grammar.NewSymbol("(")
-	rparen := grammar.NewSymbol(")")
-	plus := grammar.NewSymbol("+")
-	mult := grammar.NewSymbol("*")
+	lparen := dsl.NewSymbol("(")
+	rparen := dsl.NewSymbol(")")
+	plus := dsl.NewSymbol("+")
+	mult := dsl.NewSymbol("*")
 
-	gram := grammar.NewGrammar(S)
+	gram := dsl.NewGrammar(S)
 	gram.AddRule(S, exp)
 	gram.AddRule(exp, lparen, exp, rparen)
 	gram.AddRule(exp, exp, plus, exp)
@@ -31,21 +31,21 @@ func doExp() {
 }
 
 func doSQL() {
-	S := grammar.NewSymbol("S")
+	S := dsl.NewSymbol("S")
 
-	T1 := grammar.NewSymbol("T1")
-	T2 := grammar.NewSymbol("T2")
-	T3 := grammar.NewSymbol("T3")
-	T4 := grammar.NewSymbol("T4")
+	T1 := dsl.NewSymbol("T1")
+	T2 := dsl.NewSymbol("T2")
+	T3 := dsl.NewSymbol("T3")
+	T4 := dsl.NewSymbol("T4")
 
-	sel := grammar.NewSymbol("select")
-	sort := grammar.NewSymbol("sort")
-	fil := grammar.NewSymbol("filter")
-	grp := grammar.NewSymbol("groupby")
-	join := grammar.NewSymbol("join")
-	tbls := grammar.NewSymbol("tbls")
+	sel := dsl.NewSymbol("select")
+	sort := dsl.NewSymbol("sort")
+	fil := dsl.NewSymbol("filter")
+	grp := dsl.NewSymbol("groupby")
+	join := dsl.NewSymbol("join")
+	tbls := dsl.NewSymbol("tbls")
 
-	gram := grammar.NewGrammar(S)
+	gram := dsl.NewGrammar(S)
 	gram.AddRule(S, sel, T1)
 	gram.AddRule(T1, sort, T2)
 	gram.AddRule(T2, fil, T3)
