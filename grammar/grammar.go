@@ -58,7 +58,7 @@ func (g Grammar) String() string {
 	str += "----------------------------------\n"
 	str += "START : " + g.start.String() + "\n"
 	str += "RULES : \n" + g.rules.String() + "\n"
-	str += "SYMBOS: " + g.symbols.String() + "\n"
+	str += "SYMBOLS: " + g.symbols.String() + "\n"
 	str += "----------------------------------"
 	return str
 }
