@@ -14,10 +14,12 @@ func main() {
 func doExp() {
 	S := dsl.NewSymbol("S")
 
-	exp := dsl.NewSymbol("EXP")
+	exp := dsl.NewSymbol("exp")
 
-	plus := dsl.NewSymbol("+")
-	mult := dsl.NewSymbol("*")
+	plus := dsl.NewSymbol("add")
+	mult := dsl.NewSymbol("mult")
+	cnst := dsl.NewSymbol("const")
+
 	c1 := dsl.NewSymbol("1")
 	c2 := dsl.NewSymbol("2")
 	c3 := dsl.NewSymbol("3")
@@ -25,12 +27,15 @@ func doExp() {
 
 	gram := dsl.NewGrammar(S)
 	gram.AddRule(S, exp)
-	gram.AddRule(exp, plus, exp, exp)
-	gram.AddRule(exp, mult, exp, exp)
-	gram.AddRule(exp, c1)
-	gram.AddRule(exp, c2)
-	gram.AddRule(exp, c3)
-	gram.AddRule(exp, c4)
+	gram.AddRule(exp, plus)
+	gram.AddRule(exp, mult)
+	gram.AddRule(exp, cnst)
+	gram.AddRule(plus, exp, exp)
+	gram.AddRule(mult, exp, exp)
+	gram.AddRule(cnst, c1)
+	gram.AddRule(cnst, c2)
+	gram.AddRule(cnst, c3)
+	gram.AddRule(cnst, c4)
 
 	fmt.Println(gram)
 
