@@ -9,14 +9,14 @@ type Symbol struct {
 	isTerminal bool
 }
 
-func NewSymbol(id string) Symbol {
-	return Symbol{
+func NewSymbol(id string) *Symbol {
+	return &Symbol{
 		Id:         id,
 		isTerminal: true,
 	}
 }
 
-func (s Symbol) IsTerminal() bool {
+func (s *Symbol) IsTerminal() bool {
 	return s.isTerminal
 }
 
@@ -33,10 +33,10 @@ func (s Symbol) String() string {
 type Grammar struct {
 	symbols symbolSet
 	rules   rules
-	start   Symbol
+	start   *Symbol
 }
 
-func NewGrammar(start Symbol) Grammar {
+func NewGrammar(start *Symbol) Grammar {
 	start.isTerminal = false
 	return Grammar{
 		symbols: newSymbols(),
@@ -45,7 +45,7 @@ func NewGrammar(start Symbol) Grammar {
 	}
 }
 
-func (g *Grammar) AddRule(left Symbol, right ...Symbol) {
+func (g *Grammar) AddRule(left *Symbol, right ...*Symbol) {
 	g.symbols.addSymbol(left)
 	for _, r := range right {
 		g.symbols.addSymbol(r)
@@ -64,16 +64,16 @@ func (g Grammar) String() string {
 }
 
 type symbolSet struct {
-	symbols map[Symbol]struct{}
+	symbols map[*Symbol]struct{}
 }
 
 func newSymbols() symbolSet {
 	return symbolSet{
-		symbols: make(map[Symbol]struct{}),
+		symbols: make(map[*Symbol]struct{}),
 	}
 }
 
-func (ss *symbolSet) addSymbol(s Symbol) {
+func (ss *symbolSet) addSymbol(s *Symbol) {
 	ss.symbols[s] = struct{}{}
 }
 
@@ -95,7 +95,7 @@ func newRules() rules {
 	}
 }
 
-func (rs *rules) addRule(lsymbol Symbol, rsymbols sequence) {
+func (rs *rules) addRule(lsymbol *Symbol, rsymbols sequence) {
 	left := newLhs(lsymbol)
 	right, e := rs.ruleMap[left]
 	if !e {
@@ -114,10 +114,10 @@ func (rs rules) String() string {
 }
 
 type lhs struct {
-	symbol Symbol
+	symbol *Symbol
 }
 
-func newLhs(s Symbol) lhs {
+func newLhs(s *Symbol) lhs {
 	s.isTerminal = false
 	return lhs{
 		symbol: s,
@@ -147,10 +147,10 @@ func (r rhs) String() string {
 }
 
 type sequence struct {
-	symbols []Symbol
+	symbols []*Symbol
 }
 
-func newSeqence(symbols ...Symbol) sequence {
+func newSeqence(symbols ...*Symbol) sequence {
 	seq := sequence{}
 	for _, s := range symbols {
 		seq.addSymbol(s)
@@ -158,7 +158,7 @@ func newSeqence(symbols ...Symbol) sequence {
 	return seq
 }
 
-func (sq *sequence) addSymbol(s Symbol) {
+func (sq *sequence) addSymbol(s *Symbol) {
 	sq.symbols = append(sq.symbols, s)
 }
 
