@@ -20,14 +20,45 @@ func doExp() {
 	rparen := dsl.NewSymbol(")")
 	plus := dsl.NewSymbol("+")
 	mult := dsl.NewSymbol("*")
+	c1 := dsl.NewSymbol("1")
+	c2 := dsl.NewSymbol("2")
+	c3 := dsl.NewSymbol("3")
+	c4 := dsl.NewSymbol("4")
 
 	gram := dsl.NewGrammar(S)
 	gram.AddRule(S, exp)
 	gram.AddRule(exp, lparen, exp, rparen)
 	gram.AddRule(exp, exp, plus, exp)
 	gram.AddRule(exp, exp, mult, exp)
+	gram.AddRule(exp, c1)
+	gram.AddRule(exp, c2)
+	gram.AddRule(exp, c3)
+	gram.AddRule(exp, c4)
 
 	fmt.Println(gram)
+
+	nodeS := dsl.NewAstNode(S)
+	nodeE1 := dsl.NewAstNode(exp)
+	nodeE2 := dsl.NewAstNode(exp)
+	nodeE3 := dsl.NewAstNode(exp)
+
+	nodeLparen := dsl.NewAstNode(lparen)
+	nodeRparen := dsl.NewAstNode(rparen)
+	nodePlus := dsl.NewAstNode(plus)
+	nodeMult := dsl.NewAstNode(mult)
+
+	nodeC1 := dsl.NewAstNode(c1)
+	nodeC3 := dsl.NewAstNode(c3)
+	nodeC4 := dsl.NewAstNode(c4)
+
+	nodeS.AddChildren(nodeE1)
+	nodeE1.AddChildren(nodeE2, nodeMult, nodeC3)
+	nodeE2.AddChildren(nodeLparen, nodeE3, nodeRparen)
+	nodeE3.AddChildren(nodeC4, nodePlus, nodeC1)
+
+	fmt.Println(nodeS.String())
+	fmt.Println(nodeS.FormattedString())
+
 }
 
 func doSQL() {
