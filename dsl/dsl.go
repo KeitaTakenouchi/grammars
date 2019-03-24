@@ -213,7 +213,7 @@ func (n *ProgramTree) String() string {
 	} else {
 		symbolStr = n.Symbol.String()
 	}
-	if len(n.Children) == 0 {
+	if n.Children == nil || len(n.Children) == 0 {
 		return symbolStr
 	}
 	childStrs := make([]string, len(n.Children))
@@ -280,6 +280,9 @@ func NewEvalResult(value interface{}) EvalResult {
 	}
 }
 
-func (e EvalResult) Value() interface{} {
-	return e.value
+func (e EvalResult) Value() (interface{}, bool) {
+	if e.value != nil {
+		return e.value, true
+	}
+	return nil, false
 }
