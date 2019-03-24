@@ -99,18 +99,19 @@ func TestEvaluator_Eval_Exp(t *testing.T) {
 	plus := NewSymbol("add")
 	mult := NewSymbol("mult")
 	cnst := NewSymbol("const")
-	_, _, _, _, _ = S, exp, plus, mult, cnst
+	param := NewSymbol("param")
+	_, _, _, _, _, _ = S, exp, plus, mult, cnst, param
 
-	var eval func(node *ProgramTree) EvalResult
-	eval = func(node *ProgramTree) EvalResult {
+	var eval func(*ProgramTree, Env) EvalResult
+	eval = func(node *ProgramTree, env Env) EvalResult {
 		var ret EvalResult
 		switch node.Symbol {
 		case plus:
-			e1, ok := eval(node.Children[0]).Value()
+			e1, ok := eval(node.Children[0], env).Value()
 			if !ok {
 				return NewEvalResult(nil)
 			}
-			e2, ok := eval(node.Children[1]).Value()
+			e2, ok := eval(node.Children[1], env).Value()
 			if !ok {
 				return NewEvalResult(nil)
 			}
@@ -118,11 +119,11 @@ func TestEvaluator_Eval_Exp(t *testing.T) {
 			v2 := e2.(int)
 			ret = NewEvalResult(v1 + v2)
 		case mult:
-			e1, ok := eval(node.Children[0]).Value()
+			e1, ok := eval(node.Children[0], env).Value()
 			if !ok {
 				return NewEvalResult(nil)
 			}
-			e2, ok := eval(node.Children[1]).Value()
+			e2, ok := eval(node.Children[1], env).Value()
 			if !ok {
 				return NewEvalResult(nil)
 			}
@@ -135,53 +136,69 @@ func TestEvaluator_Eval_Exp(t *testing.T) {
 				log.Fatal("the const doesn't hava the value")
 			}
 			ret = NewEvalResult(val)
+		case param:
+			i, err := node.Value()
+			if !err {
+				log.Fatal("the const doesn't hava the value")
+			}
+			ret = NewEvalResult(env.GetArg(i.(int)))
 		default:
 			// S, exp,
 			if len(node.Children) == 0 {
 				return NewEvalResult(nil)
 			}
-			ret = eval(node.Children[0])
+			ret = eval(node.Children[0], env)
 		}
 		return ret
 	}
 	evaluator := NewEvaluator(eval)
 
-	type N = ProgramTree
+	type PGM = ProgramTree
+	type args struct {
+		env Env
+		pgm *PGM
+	}
 	tests := []struct {
 		name string
-		arg  *ProgramTree
+		args args
 		want EvalResult
 	}{
 		{
 			name: "(1+4)*3",
 			want: NewEvalResult(15),
-			arg: &N{
-				Symbol: mult, Children: []*N{
-					&N{
-						Symbol: plus, Children: []*N{
-							&N{Symbol: cnst, value: 1},
-							&N{Symbol: cnst, value: 4},
+			args: args{
+				env: NewEnv(),
+				pgm: &PGM{
+					Symbol: mult, Children: []*PGM{
+						&PGM{
+							Symbol: plus, Children: []*PGM{
+								&PGM{Symbol: cnst, value: 1},
+								&PGM{Symbol: cnst, value: 4},
+							},
 						},
+						&PGM{Symbol: cnst, value: 3},
 					},
-					&N{Symbol: cnst, value: 3},
 				},
 			},
 		},
 		{
 			name: "10*((1+4)*3)",
 			want: NewEvalResult(150),
-			arg: &N{
-				Symbol: mult, Children: []*N{
-					&N{Symbol: cnst, value: 10},
-					&N{
-						Symbol: mult, Children: []*N{
-							&N{
-								Symbol: plus, Children: []*N{
-									&N{Symbol: cnst, value: 1},
-									&N{Symbol: cnst, value: 4},
+			args: args{
+				env: NewEnv(),
+				pgm: &PGM{
+					Symbol: mult, Children: []*PGM{
+						&PGM{Symbol: cnst, value: 10},
+						&PGM{
+							Symbol: mult, Children: []*PGM{
+								&PGM{
+									Symbol: plus, Children: []*PGM{
+										&PGM{Symbol: cnst, value: 1},
+										&PGM{Symbol: cnst, value: 4},
+									},
 								},
+								&PGM{Symbol: cnst, value: 3},
 							},
-							&N{Symbol: cnst, value: 3},
 						},
 					},
 				},
@@ -190,32 +207,78 @@ func TestEvaluator_Eval_Exp(t *testing.T) {
 		{
 			name: "10",
 			want: NewEvalResult(10),
-			arg:  &N{Symbol: cnst, value: 10},
+			args: args{
+				env: NewEnv(),
+				pgm: &PGM{Symbol: cnst, value: 10},
+			},
 		},
 		{
 			name: "-10",
 			want: NewEvalResult(-10),
-			arg:  &N{Symbol: cnst, value: -10},
+			args: args{
+				env: NewEnv(),
+				pgm: &PGM{Symbol: cnst, value: -10},
+			},
 		},
 		{
 			name: "S",
 			want: NewEvalResult(nil),
-			arg:  &N{Symbol: S},
+			args: args{
+				env: NewEnv(),
+				pgm: &PGM{Symbol: S},
+			},
 		},
 		{
 			name: "exp*4",
 			want: NewEvalResult(nil),
-			arg: &N{
-				Symbol: mult, Children: []*N{
-					&N{Symbol: exp},
-					&N{Symbol: cnst, value: 4},
+			args: args{
+				env: NewEnv(),
+				pgm: &PGM{
+					Symbol: mult, Children: []*PGM{
+						&PGM{Symbol: exp},
+						&PGM{Symbol: cnst, value: 4},
+					},
+				},
+			},
+		},
+		{
+			name: "param(0) with Env[100]",
+			want: NewEvalResult(100),
+			args: args{
+				env: NewEnv(100),
+				pgm: &PGM{Symbol: param, value: 0},
+			},
+		},
+		{
+			name: "param(1) with Env[100, 200]",
+			want: NewEvalResult(200),
+			args: args{
+				env: NewEnv(100, 200),
+				pgm: &PGM{Symbol: param, value: 1},
+			},
+		},
+		{
+			name: "(param(1)+4)*param(3)",
+			want: NewEvalResult(-24),
+			args: args{
+				env: NewEnv(10, 2, 4, -4),
+				pgm: &PGM{
+					Symbol: mult, Children: []*PGM{
+						&PGM{
+							Symbol: plus, Children: []*PGM{
+								&PGM{Symbol: param, value: 1},
+								&PGM{Symbol: cnst, value: 4},
+							},
+						},
+						&PGM{Symbol: param, value: 3},
+					},
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := evaluator.Eval(tt.arg); !reflect.DeepEqual(got, tt.want) {
+			if got := evaluator.Eval(tt.args.pgm, tt.args.env); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Evaluator.Eval() = %v, want %v", got, tt.want)
 			}
 		})

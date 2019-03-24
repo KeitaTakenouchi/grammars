@@ -20,6 +20,7 @@ func doExp() {
 	plus := dsl.NewSymbol("add")
 	mult := dsl.NewSymbol("mult")
 	cnst := dsl.NewSymbol("const")
+	param := dsl.NewSymbol("param")
 
 	gram := dsl.NewGrammar(S)
 	gram.AddRule(S, exp)
@@ -31,16 +32,16 @@ func doExp() {
 
 	fmt.Println(gram)
 
-	var eval func(node *dsl.ProgramTree) dsl.EvalResult
-	eval = func(node *dsl.ProgramTree) dsl.EvalResult {
+	var eval func(*dsl.ProgramTree, dsl.Env) dsl.EvalResult
+	eval = func(node *dsl.ProgramTree, env dsl.Env) dsl.EvalResult {
 		var ret dsl.EvalResult
 		switch node.Symbol {
 		case plus:
-			e1, ok := eval(node.Children[0]).Value()
+			e1, ok := eval(node.Children[0], env).Value()
 			if !ok {
 				return dsl.NewEvalResult(nil)
 			}
-			e2, ok := eval(node.Children[1]).Value()
+			e2, ok := eval(node.Children[1], env).Value()
 			if !ok {
 				return dsl.NewEvalResult(nil)
 			}
@@ -48,11 +49,11 @@ func doExp() {
 			v2 := e2.(int)
 			ret = dsl.NewEvalResult(v1 + v2)
 		case mult:
-			e1, ok := eval(node.Children[0]).Value()
+			e1, ok := eval(node.Children[0], env).Value()
 			if !ok {
 				return dsl.NewEvalResult(nil)
 			}
-			e2, ok := eval(node.Children[1]).Value()
+			e2, ok := eval(node.Children[1], env).Value()
 			if !ok {
 				return dsl.NewEvalResult(nil)
 			}
@@ -65,12 +66,18 @@ func doExp() {
 				log.Fatal("the const doesn't hava the value")
 			}
 			ret = dsl.NewEvalResult(val)
+		case param:
+			i, err := node.Value()
+			if !err {
+				log.Fatal("the const doesn't hava the value")
+			}
+			ret = dsl.NewEvalResult(env.GetArg(i.(int)))
 		default:
 			// S, exp,
 			if len(node.Children) == 0 {
 				return dsl.NewEvalResult(nil)
 			}
-			ret = eval(node.Children[0])
+			ret = eval(node.Children[0], env)
 		}
 		return ret
 	}
@@ -85,16 +92,20 @@ func doExp() {
 	nodeC2 := dsl.NewProgramTree(cnst).With(2)
 	nodeC3 := dsl.NewProgramTree(cnst).With(3)
 	nodeC4 := dsl.NewProgramTree(cnst).With(4)
-	_, _, _, _ = nodeC1, nodeC2, nodeC3, nodeC4
+
+	nodeP0 := dsl.NewProgramTree(param).With(0)
+	nodeP1 := dsl.NewProgramTree(param).With(1)
+	_, _, _, _, _, _ = nodeC1, nodeC2, nodeC3, nodeC4, nodeP0, nodeP1
 
 	nodeS.AddChildren(nodeMult)
 	nodeMult.AddChildren(nodePlus, nodeC3)
-	nodePlus.AddChildren(nodeC1, nodeC4)
+	nodePlus.AddChildren(nodeC1, nodeP0)
 
 	fmt.Println(nodeS.String())
 	fmt.Println(nodeS.FormattedString())
 
-	result := evaluator.Eval(nodeS)
+	env := dsl.NewEnv(100, 200)
+	result := evaluator.Eval(nodeS, env)
 	v, _ := result.Value()
 	fmt.Printf("RESULT = %v\n", v)
 }

@@ -2,6 +2,7 @@ package dsl
 
 import (
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -257,17 +258,17 @@ func (n *ProgramTree) FormattedString() string {
 }
 
 type Evaluator struct {
-	evalFunc func(*ProgramTree) EvalResult
+	evalFunc func(*ProgramTree, Env) EvalResult
 }
 
-func NewEvaluator(eval func(*ProgramTree) EvalResult) Evaluator {
+func NewEvaluator(eval func(*ProgramTree, Env) EvalResult) Evaluator {
 	return Evaluator{
 		evalFunc: eval,
 	}
 }
 
-func (e *Evaluator) Eval(ast *ProgramTree) EvalResult {
-	return e.evalFunc(ast)
+func (e *Evaluator) Eval(ast *ProgramTree, env Env) EvalResult {
+	return e.evalFunc(ast, env)
 }
 
 type EvalResult struct {
@@ -285,4 +286,25 @@ func (e EvalResult) Value() (interface{}, bool) {
 		return e.value, true
 	}
 	return nil, false
+}
+
+type Env struct {
+	args []interface{}
+}
+
+func NewEnv(args ...interface{}) Env {
+	return Env{
+		args: args,
+	}
+}
+
+func (e *Env) AddArgs(args ...interface{}) {
+	e.args = append(e.args, args...)
+}
+
+func (e *Env) GetArg(i int) interface{} {
+	if i >= len(e.args) {
+		log.Fatal("invalid index of args in Environment")
+	}
+	return e.args[i]
 }
