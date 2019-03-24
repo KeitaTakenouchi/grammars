@@ -176,7 +176,7 @@ type ProgramTree struct {
 	Children []*ProgramTree
 }
 
-func NewAstNode(s *Symbol) *ProgramTree {
+func NewProgramTree(s *Symbol) *ProgramTree {
 	return &ProgramTree{
 		Symbol:   s,
 		Parent:   nil,
