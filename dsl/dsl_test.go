@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestSymbol_String_01(t *testing.T) {
+func TestSymbol_01(t *testing.T) {
 	S := NewSymbol("S")
 	exp := NewSymbol("EXP")
 	plus := NewSymbol("+")
@@ -43,7 +43,7 @@ func TestSymbol_String_01(t *testing.T) {
 	})
 }
 
-func TestSymbol_String_02(t *testing.T) {
+func TestSymbol_02(t *testing.T) {
 	S := NewSymbol("S")
 	exp := NewSymbol("EXP")
 	lparen := NewSymbol("(")
