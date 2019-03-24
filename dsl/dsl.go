@@ -236,16 +236,29 @@ func (n *ProgramTree) FormattedString() string {
 }
 
 type Evaluator struct {
-	EvalFunc func(*ProgramTree) interface{}
+	EvalFunc func(*ProgramTree) EvalResult
 }
 
-func NewEvaluator(eval func(*ProgramTree) interface{}) interface{} {
+func NewEvaluator(eval func(*ProgramTree) EvalResult) Evaluator {
 	return Evaluator{
 		EvalFunc: eval,
 	}
 }
 
-func (e *Evaluator) Eval(ast *ProgramTree) interface{} {
+func (e *Evaluator) Eval(ast *ProgramTree) EvalResult {
+	return e.EvalFunc(ast)
+}
 
-	return "result"
+type EvalResult struct {
+	value interface{}
+}
+
+func NewEvalResult(value interface{}) EvalResult {
+	return EvalResult{
+		value: value,
+	}
+}
+
+func (e EvalResult) Value() interface{} {
+	return e.value
 }

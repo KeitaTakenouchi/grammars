@@ -44,16 +44,51 @@ func doExp() {
 	nodeMult := dsl.NewProgramTree(mult)
 
 	nodeC1 := dsl.NewProgramTree(c1)
+	nodeC2 := dsl.NewProgramTree(c2)
 	nodeC3 := dsl.NewProgramTree(c3)
 	nodeC4 := dsl.NewProgramTree(c4)
+	_, _, _, _ = nodeC1, nodeC2, nodeC3, nodeC4
 
 	nodeS.AddChildren(nodeMult)
-	nodeMult.AddChildren(nodePlus, nodeC3)
-	nodePlus.AddChildren(nodeC4, nodeC1)
+	nodeMult.AddChildren(nodePlus, nodeC4)
+	nodePlus.AddChildren(nodeC4, nodeC4)
 
 	fmt.Println(nodeS.String())
 	fmt.Println(nodeS.FormattedString())
 
+	var evalFunc func(node *dsl.ProgramTree) dsl.EvalResult
+	evalFunc = func(node *dsl.ProgramTree) dsl.EvalResult {
+		var ret dsl.EvalResult
+		switch node.Symbol {
+		case plus:
+			e1 := evalFunc(node.Children[0]).Value()
+			e2 := evalFunc(node.Children[1]).Value()
+			v1 := e1.(int)
+			v2 := e2.(int)
+			ret = dsl.NewEvalResult(v1 + v2)
+		case mult:
+			e1 := evalFunc(node.Children[0]).Value()
+			e2 := evalFunc(node.Children[1]).Value()
+			v1 := e1.(int)
+			v2 := e2.(int)
+			ret = dsl.NewEvalResult(v1 * v2)
+		case c1:
+			ret = dsl.NewEvalResult(1)
+		case c2:
+			ret = dsl.NewEvalResult(2)
+		case c3:
+			ret = dsl.NewEvalResult(3)
+		case c4:
+			ret = dsl.NewEvalResult(4)
+		default:
+			// S, exp, cnst
+			ret = evalFunc(node.Children[0])
+		}
+		return ret
+	}
+	evaluator := dsl.NewEvaluator(evalFunc)
+	result := evaluator.Eval(nodeS)
+	fmt.Println("RESULT =", result.Value())
 }
 
 func doSQL() {
