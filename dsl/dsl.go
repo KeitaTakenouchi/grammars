@@ -170,28 +170,28 @@ func (sq sequence) String() string {
 	return strings.Join(strs, " ")
 }
 
-type AstNode struct {
+type ProgramTree struct {
 	Symbol   *Symbol
-	Parent   *AstNode
-	Children []*AstNode
+	Parent   *ProgramTree
+	Children []*ProgramTree
 }
 
-func NewAstNode(s *Symbol) *AstNode {
-	return &AstNode{
+func NewAstNode(s *Symbol) *ProgramTree {
+	return &ProgramTree{
 		Symbol:   s,
 		Parent:   nil,
-		Children: make([]*AstNode, 0),
+		Children: make([]*ProgramTree, 0),
 	}
 }
 
-func (n *AstNode) AddChildren(children ...*AstNode) {
+func (n *ProgramTree) AddChildren(children ...*ProgramTree) {
 	n.Children = append(n.Children, children...)
 	for _, c := range children {
 		c.Parent = n
 	}
 }
 
-func (n *AstNode) String() string {
+func (n *ProgramTree) String() string {
 	if len(n.Children) == 0 {
 		return n.Symbol.String()
 	}
@@ -202,7 +202,7 @@ func (n *AstNode) String() string {
 	return n.Symbol.String() + "[" + strings.Join(strs, ",") + "]"
 }
 
-func (n *AstNode) FormattedString() string {
+func (n *ProgramTree) FormattedString() string {
 	// function definition
 	spaces := func(n int) string {
 		var ret string
@@ -236,16 +236,16 @@ func (n *AstNode) FormattedString() string {
 }
 
 type Evaluator struct {
-	EvalFunc func(*AstNode) interface{}
+	EvalFunc func(*ProgramTree) interface{}
 }
 
-func NewEvaluator(eval func(*AstNode) interface{}) interface{} {
+func NewEvaluator(eval func(*ProgramTree) interface{}) interface{} {
 	return Evaluator{
 		EvalFunc: eval,
 	}
 }
 
-func (e *Evaluator) Eval(ast *AstNode) interface{} {
+func (e *Evaluator) Eval(ast *ProgramTree) interface{} {
 
 	return "result"
 }
