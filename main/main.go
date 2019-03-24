@@ -31,23 +31,6 @@ func doExp() {
 
 	fmt.Println(gram)
 
-	nodeS := dsl.NewProgramTree(S)
-	nodePlus := dsl.NewProgramTree(plus)
-	nodeMult := dsl.NewProgramTree(mult)
-
-	nodeC1 := dsl.NewProgramTree(cnst).With(1)
-	nodeC2 := dsl.NewProgramTree(cnst).With(2)
-	nodeC3 := dsl.NewProgramTree(cnst).With(3)
-	nodeC4 := dsl.NewProgramTree(cnst).With(4)
-	_, _, _, _ = nodeC1, nodeC2, nodeC3, nodeC4
-
-	nodeS.AddChildren(nodeMult)
-	nodeMult.AddChildren(nodePlus, nodeC3)
-	nodePlus.AddChildren(nodeC1, nodeC4)
-
-	fmt.Println(nodeS.String())
-	fmt.Println(nodeS.FormattedString())
-
 	var eval func(node *dsl.ProgramTree) dsl.EvalResult
 	eval = func(node *dsl.ProgramTree) dsl.EvalResult {
 		var ret dsl.EvalResult
@@ -77,6 +60,25 @@ func doExp() {
 		return ret
 	}
 	evaluator := dsl.NewEvaluator(eval)
+
+	// Create a program tree to be evaluated.
+	nodeS := dsl.NewProgramTree(S)
+	nodePlus := dsl.NewProgramTree(plus)
+	nodeMult := dsl.NewProgramTree(mult)
+
+	nodeC1 := dsl.NewProgramTree(cnst).With(1)
+	nodeC2 := dsl.NewProgramTree(cnst).With(2)
+	nodeC3 := dsl.NewProgramTree(cnst).With(3)
+	nodeC4 := dsl.NewProgramTree(cnst).With(4)
+	_, _, _, _ = nodeC1, nodeC2, nodeC3, nodeC4
+
+	nodeS.AddChildren(nodeMult)
+	nodeMult.AddChildren(nodePlus, nodeC3)
+	nodePlus.AddChildren(nodeC1, nodeC4)
+
+	fmt.Println(nodeS.String())
+	fmt.Println(nodeS.FormattedString())
+
 	result := evaluator.Eval(nodeS)
 	fmt.Println("RESULT =", result.Value())
 }
