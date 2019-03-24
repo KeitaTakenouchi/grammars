@@ -56,19 +56,19 @@ func doExp() {
 	fmt.Println(nodeS.String())
 	fmt.Println(nodeS.FormattedString())
 
-	var evalFunc func(node *dsl.ProgramTree) dsl.EvalResult
-	evalFunc = func(node *dsl.ProgramTree) dsl.EvalResult {
+	var eval func(node *dsl.ProgramTree) dsl.EvalResult
+	eval = func(node *dsl.ProgramTree) dsl.EvalResult {
 		var ret dsl.EvalResult
 		switch node.Symbol {
 		case plus:
-			e1 := evalFunc(node.Children[0]).Value()
-			e2 := evalFunc(node.Children[1]).Value()
+			e1 := eval(node.Children[0]).Value()
+			e2 := eval(node.Children[1]).Value()
 			v1 := e1.(int)
 			v2 := e2.(int)
 			ret = dsl.NewEvalResult(v1 + v2)
 		case mult:
-			e1 := evalFunc(node.Children[0]).Value()
-			e2 := evalFunc(node.Children[1]).Value()
+			e1 := eval(node.Children[0]).Value()
+			e2 := eval(node.Children[1]).Value()
 			v1 := e1.(int)
 			v2 := e2.(int)
 			ret = dsl.NewEvalResult(v1 * v2)
@@ -82,11 +82,11 @@ func doExp() {
 			ret = dsl.NewEvalResult(4)
 		default:
 			// S, exp, cnst
-			ret = evalFunc(node.Children[0])
+			ret = eval(node.Children[0])
 		}
 		return ret
 	}
-	evaluator := dsl.NewEvaluator(evalFunc)
+	evaluator := dsl.NewEvaluator(eval)
 	result := evaluator.Eval(nodeS)
 	fmt.Println("RESULT =", result.Value())
 }
