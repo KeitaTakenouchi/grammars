@@ -234,3 +234,18 @@ func (n *AstNode) FormattedString() string {
 	}
 	return str
 }
+
+type Evaluator struct {
+	EvalFunc func(*AstNode) interface{}
+}
+
+func NewEvaluator(eval func(*AstNode) interface{}) interface{} {
+	return Evaluator{
+		EvalFunc: eval,
+	}
+}
+
+func (e *Evaluator) Eval(ast *AstNode) interface{} {
+
+	return "result"
+}
