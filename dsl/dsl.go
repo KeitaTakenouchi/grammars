@@ -257,17 +257,17 @@ func (n *ProgramTree) FormattedString() string {
 }
 
 type Evaluator struct {
-	EvalFunc func(*ProgramTree) EvalResult
+	evalFunc func(*ProgramTree) EvalResult
 }
 
 func NewEvaluator(eval func(*ProgramTree) EvalResult) Evaluator {
 	return Evaluator{
-		EvalFunc: eval,
+		evalFunc: eval,
 	}
 }
 
 func (e *Evaluator) Eval(ast *ProgramTree) EvalResult {
-	return e.EvalFunc(ast)
+	return e.evalFunc(ast)
 }
 
 type EvalResult struct {
