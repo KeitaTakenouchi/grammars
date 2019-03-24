@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/KeitaTakenouchi/grammars/dsl"
 )
@@ -20,11 +21,6 @@ func doExp() {
 	mult := dsl.NewSymbol("mult")
 	cnst := dsl.NewSymbol("const")
 
-	c1 := dsl.NewSymbol("1")
-	c2 := dsl.NewSymbol("2")
-	c3 := dsl.NewSymbol("3")
-	c4 := dsl.NewSymbol("4")
-
 	gram := dsl.NewGrammar(S)
 	gram.AddRule(S, exp)
 	gram.AddRule(exp, plus)
@@ -32,10 +28,6 @@ func doExp() {
 	gram.AddRule(exp, cnst)
 	gram.AddRule(plus, exp, exp)
 	gram.AddRule(mult, exp, exp)
-	gram.AddRule(cnst, c1)
-	gram.AddRule(cnst, c2)
-	gram.AddRule(cnst, c3)
-	gram.AddRule(cnst, c4)
 
 	fmt.Println(gram)
 
@@ -43,15 +35,15 @@ func doExp() {
 	nodePlus := dsl.NewProgramTree(plus)
 	nodeMult := dsl.NewProgramTree(mult)
 
-	nodeC1 := dsl.NewProgramTree(c1)
-	nodeC2 := dsl.NewProgramTree(c2)
-	nodeC3 := dsl.NewProgramTree(c3)
-	nodeC4 := dsl.NewProgramTree(c4)
+	nodeC1 := dsl.NewProgramTree(cnst).With(1)
+	nodeC2 := dsl.NewProgramTree(cnst).With(2)
+	nodeC3 := dsl.NewProgramTree(cnst).With(3)
+	nodeC4 := dsl.NewProgramTree(cnst).With(4)
 	_, _, _, _ = nodeC1, nodeC2, nodeC3, nodeC4
 
 	nodeS.AddChildren(nodeMult)
-	nodeMult.AddChildren(nodePlus, nodeC4)
-	nodePlus.AddChildren(nodeC4, nodeC4)
+	nodeMult.AddChildren(nodePlus, nodeC3)
+	nodePlus.AddChildren(nodeC1, nodeC4)
 
 	fmt.Println(nodeS.String())
 	fmt.Println(nodeS.FormattedString())
@@ -72,16 +64,14 @@ func doExp() {
 			v1 := e1.(int)
 			v2 := e2.(int)
 			ret = dsl.NewEvalResult(v1 * v2)
-		case c1:
-			ret = dsl.NewEvalResult(1)
-		case c2:
-			ret = dsl.NewEvalResult(2)
-		case c3:
-			ret = dsl.NewEvalResult(3)
-		case c4:
-			ret = dsl.NewEvalResult(4)
+		case cnst:
+			val, err := node.Value()
+			if !err {
+				log.Fatal("the const doesn't hava the value")
+			}
+			ret = dsl.NewEvalResult(val)
 		default:
-			// S, exp, cnst
+			// S, exp,
 			ret = eval(node.Children[0])
 		}
 		return ret

@@ -1,6 +1,7 @@
 package dsl
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -174,6 +175,7 @@ type ProgramTree struct {
 	Symbol   *Symbol
 	Parent   *ProgramTree
 	Children []*ProgramTree
+	value    interface{}
 }
 
 func NewProgramTree(s *Symbol) *ProgramTree {
@@ -181,6 +183,7 @@ func NewProgramTree(s *Symbol) *ProgramTree {
 		Symbol:   s,
 		Parent:   nil,
 		Children: make([]*ProgramTree, 0),
+		value:    nil,
 	}
 }
 
@@ -191,15 +194,33 @@ func (n *ProgramTree) AddChildren(children ...*ProgramTree) {
 	}
 }
 
+func (n *ProgramTree) With(value interface{}) *ProgramTree {
+	n.value = value
+	return n
+}
+
+func (n *ProgramTree) Value() (interface{}, bool) {
+	if n.value == nil {
+		return nil, false
+	}
+	return n.value, true
+}
+
 func (n *ProgramTree) String() string {
+	var symbolStr string
+	if val, ok := n.Value(); ok {
+		symbolStr = fmt.Sprintf("%s(%v)", n.Symbol.String(), val)
+	} else {
+		symbolStr = n.Symbol.String()
+	}
 	if len(n.Children) == 0 {
-		return n.Symbol.String()
+		return symbolStr
 	}
-	strs := make([]string, len(n.Children))
+	childStrs := make([]string, len(n.Children))
 	for i, c := range n.Children {
-		strs[i] = c.String()
+		childStrs[i] = c.String()
 	}
-	return n.Symbol.String() + "[" + strings.Join(strs, ",") + "]"
+	return symbolStr + "[" + strings.Join(childStrs, ",") + "]"
 }
 
 func (n *ProgramTree) FormattedString() string {
