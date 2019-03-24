@@ -36,14 +36,26 @@ func doExp() {
 		var ret dsl.EvalResult
 		switch node.Symbol {
 		case plus:
-			e1 := eval(node.Children[0]).Value()
-			e2 := eval(node.Children[1]).Value()
+			e1, ok := eval(node.Children[0]).Value()
+			if !ok {
+				return dsl.NewEvalResult(nil)
+			}
+			e2, ok := eval(node.Children[1]).Value()
+			if !ok {
+				return dsl.NewEvalResult(nil)
+			}
 			v1 := e1.(int)
 			v2 := e2.(int)
 			ret = dsl.NewEvalResult(v1 + v2)
 		case mult:
-			e1 := eval(node.Children[0]).Value()
-			e2 := eval(node.Children[1]).Value()
+			e1, ok := eval(node.Children[0]).Value()
+			if !ok {
+				return dsl.NewEvalResult(nil)
+			}
+			e2, ok := eval(node.Children[1]).Value()
+			if !ok {
+				return dsl.NewEvalResult(nil)
+			}
 			v1 := e1.(int)
 			v2 := e2.(int)
 			ret = dsl.NewEvalResult(v1 * v2)
@@ -55,6 +67,9 @@ func doExp() {
 			ret = dsl.NewEvalResult(val)
 		default:
 			// S, exp,
+			if len(node.Children) == 0 {
+				return dsl.NewEvalResult(nil)
+			}
 			ret = eval(node.Children[0])
 		}
 		return ret
@@ -80,7 +95,8 @@ func doExp() {
 	fmt.Println(nodeS.FormattedString())
 
 	result := evaluator.Eval(nodeS)
-	fmt.Println("RESULT =", result.Value())
+	v, _ := result.Value()
+	fmt.Printf("RESULT = %v\n", v)
 }
 
 func doSQL() {
