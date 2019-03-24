@@ -39,20 +39,17 @@ func doExp() {
 
 	fmt.Println(gram)
 
-	nodeS := dsl.NewAstNode(S)
-	nodeE1 := dsl.NewAstNode(exp)
-	nodeE2 := dsl.NewAstNode(exp)
+	nodeS := dsl.NewProgramTree(S)
+	nodePlus := dsl.NewProgramTree(plus)
+	nodeMult := dsl.NewProgramTree(mult)
 
-	nodePlus := dsl.NewAstNode(plus)
-	nodeMult := dsl.NewAstNode(mult)
+	nodeC1 := dsl.NewProgramTree(c1)
+	nodeC3 := dsl.NewProgramTree(c3)
+	nodeC4 := dsl.NewProgramTree(c4)
 
-	nodeC1 := dsl.NewAstNode(c1)
-	nodeC3 := dsl.NewAstNode(c3)
-	nodeC4 := dsl.NewAstNode(c4)
-
-	nodeS.AddChildren(nodeE1)
-	nodeE1.AddChildren(nodeMult, nodeE2, nodeC3)
-	nodeE2.AddChildren(nodePlus, nodeC4, nodeC1)
+	nodeS.AddChildren(nodeMult)
+	nodeMult.AddChildren(nodePlus, nodeC3)
+	nodePlus.AddChildren(nodeC4, nodeC1)
 
 	fmt.Println(nodeS.String())
 	fmt.Println(nodeS.FormattedString())
@@ -62,11 +59,6 @@ func doExp() {
 func doSQL() {
 	S := dsl.NewSymbol("S")
 
-	T1 := dsl.NewSymbol("T1")
-	T2 := dsl.NewSymbol("T2")
-	T3 := dsl.NewSymbol("T3")
-	T4 := dsl.NewSymbol("T4")
-
 	sel := dsl.NewSymbol("select")
 	sort := dsl.NewSymbol("sort")
 	fil := dsl.NewSymbol("filter")
@@ -74,12 +66,20 @@ func doSQL() {
 	join := dsl.NewSymbol("join")
 	tbls := dsl.NewSymbol("tbls")
 
+	cols := dsl.NewSymbol("cols")
+	desc := dsl.NewSymbol("desc")
+	pred := dsl.NewSymbol("pred")
+	grpkey := dsl.NewSymbol("grpkey")
+	joinkeys := dsl.NewSymbol("keyPairs")
+
 	gram := dsl.NewGrammar(S)
-	gram.AddRule(S, sel, T1)
-	gram.AddRule(T1, sort, T2)
-	gram.AddRule(T2, fil, T3)
-	gram.AddRule(T3, grp, T4)
-	gram.AddRule(T4, join, tbls)
+	gram.AddRule(S, sel)
+	gram.AddRule(sel, sort, cols)
+	gram.AddRule(sel, fil, cols)
+	gram.AddRule(sort, fil, desc)
+	gram.AddRule(fil, grp, pred)
+	gram.AddRule(grp, join, grpkey)
+	gram.AddRule(join, tbls, joinkeys)
 
 	fmt.Println(&gram)
 }
