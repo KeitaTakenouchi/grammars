@@ -319,3 +319,37 @@ func TestEvaluator_Eval_Exp(t *testing.T) {
 		})
 	}
 }
+
+func TestProgramTree_Clone(t *testing.T) {
+	plus := NewSymbol("add")
+	mult := NewSymbol("mult")
+	cnst := NewSymbol("const")
+
+	type PGM = ProgramTree
+	tests := []struct {
+		name string
+		org  *ProgramTree
+	}{
+		{
+			name: "(1+4)*3",
+			org: &PGM{
+				Symbol: mult, Children: []*PGM{
+					&PGM{
+						Symbol: plus, Children: []*PGM{
+							&PGM{Symbol: cnst, value: 1},
+							&PGM{Symbol: cnst, value: 4},
+						},
+					},
+					&PGM{Symbol: cnst, value: 3},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.org.Clone(); got.String() != tt.org.String() {
+				t.Errorf("ProgramTree.Clone() = %v, want %v", got, tt.org)
+			}
+		})
+	}
+}

@@ -229,6 +229,20 @@ func (n *ProgramTree) Value() (interface{}, bool) {
 	return n.value, true
 }
 
+func (n *ProgramTree) Clone() *ProgramTree {
+	// shallow copy
+	thisCpy := NewProgramTree(n.Symbol)
+	thisCpy.value = n.value
+
+	// deep copy
+	for _, c := range n.Children {
+		childCpy := c.Clone()
+		childCpy.Parent = thisCpy
+		thisCpy.AddChildren(childCpy)
+	}
+	return thisCpy
+}
+
 func (n *ProgramTree) String() string {
 	var symbolStr string
 	if val, ok := n.Value(); ok {
