@@ -18,6 +18,7 @@ func doExp() {
 	exp := dsl.NewSymbol("exp")
 
 	plus := dsl.NewSymbol("add")
+	minus := dsl.NewSymbol("minus")
 	mult := dsl.NewSymbol("mult")
 	cnst := dsl.NewSymbol("const")
 	param := dsl.NewSymbol("param")
@@ -25,9 +26,11 @@ func doExp() {
 	gram := dsl.NewGrammar(S)
 	gram.AddRule(S, exp)
 	gram.AddRule(exp, plus)
+	gram.AddRule(exp, minus)
 	gram.AddRule(exp, mult)
 	gram.AddRule(exp, cnst)
 	gram.AddRule(plus, exp, exp)
+	gram.AddRule(minus, exp, exp)
 	gram.AddRule(mult, exp, exp)
 
 	fmt.Println(gram)
@@ -48,6 +51,18 @@ func doExp() {
 			v1 := e1.(int)
 			v2 := e2.(int)
 			ret = dsl.NewEvalResult(v1 + v2)
+		case minus:
+			e1, ok := eval(node.Children[0], env).Value()
+			if !ok {
+				return dsl.NewEvalResult(nil)
+			}
+			e2, ok := eval(node.Children[1], env).Value()
+			if !ok {
+				return dsl.NewEvalResult(nil)
+			}
+			v1 := e1.(int)
+			v2 := e2.(int)
+			ret = dsl.NewEvalResult(v1 - v2)
 		case mult:
 			e1, ok := eval(node.Children[0], env).Value()
 			if !ok {
@@ -86,6 +101,7 @@ func doExp() {
 	// Create a program tree to be evaluated.
 	nodeS := dsl.NewProgramTree(S)
 	nodePlus := dsl.NewProgramTree(plus)
+	nodeMinus := dsl.NewProgramTree(minus)
 	nodeMult := dsl.NewProgramTree(mult)
 
 	nodeC1 := dsl.NewProgramTree(cnst).With(1)
@@ -98,8 +114,9 @@ func doExp() {
 	_, _, _, _, _, _ = nodeC1, nodeC2, nodeC3, nodeC4, nodeP0, nodeP1
 
 	nodeS.AddChildren(nodeMult)
-	nodeMult.AddChildren(nodePlus, nodeC3)
+	nodeMult.AddChildren(nodePlus, nodeMinus)
 	nodePlus.AddChildren(nodeC1, nodeP0)
+	nodeMinus.AddChildren(nodeC4, nodeC2)
 
 	fmt.Println(nodeS.String())
 	fmt.Println(nodeS.FormattedString())
