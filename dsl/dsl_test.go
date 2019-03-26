@@ -6,6 +6,8 @@ import (
 	"testing"
 )
 
+type PGM = ProgramTree
+
 func TestSymbol_01(t *testing.T) {
 	S := NewSymbol("S")
 	exp := NewSymbol("EXP")
@@ -165,7 +167,6 @@ func TestEvaluator_Eval_Exp(t *testing.T) {
 	}
 	evaluator := NewEvaluator(eval)
 
-	type PGM = ProgramTree
 	type args struct {
 		env Env
 		pgm *PGM
@@ -325,7 +326,6 @@ func TestProgramTree_Clone(t *testing.T) {
 	mult := NewSymbol("mult")
 	cnst := NewSymbol("const")
 
-	type PGM = ProgramTree
 	tests := []struct {
 		name string
 		org  *ProgramTree
@@ -358,8 +358,6 @@ func TestProgramTree_Leaves(t *testing.T) {
 	plus := NewSymbol("add")
 	mult := NewSymbol("mult")
 	cnst := NewSymbol("const")
-
-	type PGM = ProgramTree
 
 	tests := []struct {
 		name     string
@@ -400,8 +398,6 @@ func TestProgramTree_NonTerminalLeaves(t *testing.T) {
 	mult.isTerminal = false
 	cnst := NewSymbol("const")
 	cnst.isTerminal = true
-
-	type PGM = ProgramTree
 
 	tests := []struct {
 		name     string
