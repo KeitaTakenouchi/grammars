@@ -97,10 +97,10 @@ func TestEvaluator_Eval_Exp(t *testing.T) {
 	S := NewSymbol("S")
 	exp := NewSymbol("exp")
 	plus := NewSymbol("add")
+	minus := NewSymbol("minus")
 	mult := NewSymbol("mult")
 	cnst := NewSymbol("const")
 	param := NewSymbol("param")
-	_, _, _, _, _, _ = S, exp, plus, mult, cnst, param
 
 	var eval func(*ProgramTree, Env) EvalResult
 	eval = func(node *ProgramTree, env Env) EvalResult {
@@ -118,6 +118,18 @@ func TestEvaluator_Eval_Exp(t *testing.T) {
 			v1 := e1.(int)
 			v2 := e2.(int)
 			ret = NewEvalResult(v1 + v2)
+		case minus:
+			e1, ok := eval(node.Children[0], env).Value()
+			if !ok {
+				return NewEvalResult(nil)
+			}
+			e2, ok := eval(node.Children[1], env).Value()
+			if !ok {
+				return NewEvalResult(nil)
+			}
+			v1 := e1.(int)
+			v2 := e2.(int)
+			ret = NewEvalResult(v1 - v2)
 		case mult:
 			e1, ok := eval(node.Children[0], env).Value()
 			if !ok {
@@ -193,6 +205,29 @@ func TestEvaluator_Eval_Exp(t *testing.T) {
 							Symbol: mult, Children: []*PGM{
 								&PGM{
 									Symbol: plus, Children: []*PGM{
+										&PGM{Symbol: cnst, value: 1},
+										&PGM{Symbol: cnst, value: 4},
+									},
+								},
+								&PGM{Symbol: cnst, value: 3},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "10*((1-4)*3)",
+			want: NewEvalResult(-90),
+			args: args{
+				env: NewEnv(),
+				pgm: &PGM{
+					Symbol: mult, Children: []*PGM{
+						&PGM{Symbol: cnst, value: 10},
+						&PGM{
+							Symbol: mult, Children: []*PGM{
+								&PGM{
+									Symbol: minus, Children: []*PGM{
 										&PGM{Symbol: cnst, value: 1},
 										&PGM{Symbol: cnst, value: 4},
 									},
