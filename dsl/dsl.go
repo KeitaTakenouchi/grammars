@@ -229,6 +229,28 @@ func (n *ProgramTree) Value() (interface{}, bool) {
 	return n.value, true
 }
 
+func (n *ProgramTree) Leaves() []*ProgramTree {
+	if len(n.Children) == 0 {
+		return []*ProgramTree{n}
+	}
+	ret := make([]*ProgramTree, 0)
+	for _, c := range n.Children {
+		leaves := c.Leaves()
+		ret = append(ret, leaves...)
+	}
+	return ret
+}
+
+func (n *ProgramTree) NonTerminalLeaves() []*ProgramTree {
+	ret := make([]*ProgramTree, 0)
+	for _, leaf := range n.Leaves() {
+		if !leaf.Symbol.IsTerminal() {
+			ret = append(ret, leaf)
+		}
+	}
+	return ret
+}
+
 func (n *ProgramTree) Clone() *ProgramTree {
 	// shallow copy
 	thisCpy := NewProgramTree(n.Symbol)

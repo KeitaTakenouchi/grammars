@@ -353,3 +353,97 @@ func TestProgramTree_Clone(t *testing.T) {
 		})
 	}
 }
+
+func TestProgramTree_Leaves(t *testing.T) {
+	plus := NewSymbol("add")
+	mult := NewSymbol("mult")
+	cnst := NewSymbol("const")
+
+	type PGM = ProgramTree
+
+	tests := []struct {
+		name     string
+		target   *ProgramTree
+		wantSize int
+	}{
+		{
+			name: "(1+4)*3",
+			target: &PGM{
+				Symbol: mult, Children: []*PGM{
+					&PGM{
+						Symbol: plus, Children: []*PGM{
+							&PGM{Symbol: cnst, value: 1},
+							&PGM{Symbol: cnst, value: 4},
+						},
+					},
+					&PGM{Symbol: cnst, value: 3},
+				},
+			},
+			wantSize: 3,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.target.Leaves(); len(got) != tt.wantSize {
+				t.Errorf("ProgramTree.Leaves() = %v, want the size of %v", got, tt.wantSize)
+			}
+		})
+	}
+}
+
+func TestProgramTree_NonTerminalLeaves(t *testing.T) {
+	exp := NewSymbol("exp")
+	exp.isTerminal = false
+	plus := NewSymbol("add")
+	plus.isTerminal = false
+	mult := NewSymbol("mult")
+	mult.isTerminal = false
+	cnst := NewSymbol("const")
+	cnst.isTerminal = true
+
+	type PGM = ProgramTree
+
+	tests := []struct {
+		name     string
+		target   *ProgramTree
+		wantSize int
+	}{
+		{
+			name: "(1+4)*3",
+			target: &PGM{
+				Symbol: mult, Children: []*PGM{
+					&PGM{
+						Symbol: plus, Children: []*PGM{
+							&PGM{Symbol: cnst, value: 1},
+							&PGM{Symbol: cnst, value: 4},
+						},
+					},
+					&PGM{Symbol: cnst, value: 3},
+				},
+			},
+			wantSize: 0,
+		},
+		{
+			name: "(exp+exp)*exp",
+			target: &PGM{
+				Symbol: mult, Children: []*PGM{
+					&PGM{
+						Symbol: plus, Children: []*PGM{
+							&PGM{Symbol: exp},
+							&PGM{Symbol: exp},
+						},
+					},
+					&PGM{Symbol: exp},
+				},
+			},
+			wantSize: 3,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.target.NonTerminalLeaves(); len(got) != tt.wantSize {
+				t.Errorf("ProgramTree.Leaves() = %v, want the size of %v", got, tt.wantSize)
+			}
+		})
+	}
+}
