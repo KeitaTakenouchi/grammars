@@ -47,6 +47,15 @@ func NewGrammar(start *Symbol) Grammar {
 	}
 }
 
+func (g *Grammar) GetRhs(leftSymbol *Symbol) [][]*Symbol {
+	rhs := g.rules.getRhs(leftSymbol)
+	return rhs.getAllSeqs()
+}
+
+func (g *Grammar) GetStart() *Symbol {
+	return g.start
+}
+
 func (g *Grammar) AddRule(left *Symbol, right ...*Symbol) {
 	g.symbols.addSymbol(left)
 	for _, r := range right {
@@ -107,6 +116,11 @@ func (rs *rules) addRule(lsymbol *Symbol, rsymbols sequence) {
 	rs.ruleMap[left] = right
 }
 
+func (rs *rules) getRhs(lsymbol *Symbol) rhs {
+	lhs := newLhs(lsymbol)
+	return rs.ruleMap[lhs]
+}
+
 func (rs rules) String() string {
 	var strs []string
 	for left, right := range rs.ruleMap {
@@ -134,6 +148,14 @@ func newRhs() rhs {
 	return rhs{
 		seqs: make([]sequence, 0),
 	}
+}
+
+func (r *rhs) getAllSeqs() [][]*Symbol {
+	ret := make([][]*Symbol, 0)
+	for _, seq := range r.seqs {
+		ret = append(ret, seq.symbols)
+	}
+	return ret
 }
 
 func (r *rhs) addSquence(s sequence) {
