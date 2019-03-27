@@ -131,7 +131,7 @@ func doExp() {
 		var ret []interface{}
 		switch symbol {
 		case cnst:
-			for i := 0; i <= 2; i++ {
+			for i := 1; i <= 2; i++ {
 				ret = append(ret, i)
 			}
 		}
