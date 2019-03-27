@@ -30,6 +30,7 @@ func doExp() {
 	gram.AddRule(exp, minus)
 	gram.AddRule(exp, mult)
 	gram.AddRule(exp, cnst)
+	gram.AddRule(exp, param)
 	gram.AddRule(plus, exp, exp)
 	gram.AddRule(minus, exp, exp)
 	gram.AddRule(mult, exp, exp)
@@ -127,11 +128,15 @@ func doExp() {
 	v, _ := result.Value()
 	fmt.Printf("RESULT = %v\n", v)
 
-	filler := func(symbol *dsl.Symbol) []interface{} {
+	filler := func(symbol *dsl.Symbol, example synth.Example) []interface{} {
 		var ret []interface{}
 		switch symbol {
 		case cnst:
 			for i := 1; i <= 2; i++ {
+				ret = append(ret, i)
+			}
+		case param:
+			for i := 0; i < example.GetInputCount(); i++ {
 				ret = append(ret, i)
 			}
 		}
@@ -139,6 +144,7 @@ func doExp() {
 	}
 	synthesizer := synth.NewSynthesizer(gram, evaluator, filler)
 	ex := synth.NewExample(7, 3)
+	fmt.Println("------- START SEARCH -------")
 	synthesizer.Execute(ex)
 }
 
