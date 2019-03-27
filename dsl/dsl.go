@@ -259,7 +259,6 @@ func (n *ProgramTree) Clone() *ProgramTree {
 	// deep copy
 	for _, c := range n.Children {
 		childCpy := c.Clone()
-		childCpy.Parent = thisCpy
 		thisCpy.AddChildren(childCpy)
 	}
 	return thisCpy
