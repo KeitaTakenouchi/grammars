@@ -76,8 +76,8 @@ func (s *Synthesizer) fillSketch(pgm *dsl.ProgramTree) []*dsl.ProgramTree {
 	var ret []*dsl.ProgramTree
 	for _, valueComb := range cartesianProduct(valuesList) {
 		clone := pgm.Clone()
-		for _, index := range indexesOfHoles {
-			clone.Leaves()[index].With(valueComb[index])
+		for i, indexOfHole := range indexesOfHoles {
+			clone.Leaves()[indexOfHole].With(valueComb[i])
 		}
 		ret = append(ret, clone)
 	}
