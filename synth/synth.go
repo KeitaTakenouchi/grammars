@@ -2,6 +2,7 @@ package synth
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/KeitaTakenouchi/grammars/dsl"
 )
@@ -40,6 +41,7 @@ func (s *Synthesizer) Execute(example Example) {
 		if len(nonTerminals) == 0 {
 			for _, completePgm := range s.fillSketch(target, example) {
 				if s.check(completePgm, example) {
+					fmt.Println("Count  =", counterForDebug)
 					return
 				}
 			}
@@ -88,9 +90,12 @@ func (s *Synthesizer) check(pgm *dsl.ProgramTree, example Example) bool {
 	env := dsl.NewEnv()
 	env.AddArgs(example.GetInputs()...)
 	result := s.evaluator.Eval(pgm, env)
-	if result == example.GetOutput() {
+	res, _ := result.Value()
+
+	if reflect.DeepEqual(res, example.GetOutput()) {
 		fmt.Println("-----------------------")
 		fmt.Println(pgm.FormattedString())
+		fmt.Println("intput =", example.GetInputs())
 		fmt.Println("result =", result)
 		return true
 	}
