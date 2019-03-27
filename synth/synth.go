@@ -35,6 +35,7 @@ func (s *Synthesizer) Execute(example Example) {
 		}
 
 		target := worklist[index]
+		worklist[index] = nil
 		index++
 
 		nonTerminals := target.NonTerminalLeaves()
