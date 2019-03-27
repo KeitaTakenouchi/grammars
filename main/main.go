@@ -138,7 +138,8 @@ func doExp() {
 		return ret
 	}
 	synthesizer := synth.NewSynthesizer(gram, evaluator, filler)
-	synthesizer.Execute()
+	ex := synth.NewExample(7, 3)
+	synthesizer.Execute(ex)
 }
 
 func doSQL() {

@@ -20,7 +20,7 @@ func NewSynthesizer(grammar dsl.Grammar, eval dsl.Evaluator, filler func(*dsl.Sy
 	}
 }
 
-func (s *Synthesizer) Execute() {
+func (s *Synthesizer) Execute(example Example) {
 	worklist := make([]*dsl.ProgramTree, 0)
 	start := dsl.NewProgramTree(s.grammar.GetStart())
 	worklist = append(worklist, start)
@@ -106,4 +106,32 @@ func cartesianProduct(lists [][]interface{}) [][]interface{} {
 		}
 	}
 	return ret
+}
+
+type Example struct {
+	output interface{}
+	inputs []interface{}
+}
+
+func NewExample(output interface{}, inputs ...interface{}) Example {
+	return Example{
+		output: output,
+		inputs: inputs,
+	}
+}
+
+func (e *Example) GetInputs() []interface{} {
+	return e.inputs
+}
+
+func (e *Example) GetInput(index int) interface{} {
+	return e.inputs[index]
+}
+
+func (e *Example) GetOutput() interface{} {
+	return e.output
+}
+
+func (e *Example) getInputCount() int {
+	return len(e.inputs)
 }
