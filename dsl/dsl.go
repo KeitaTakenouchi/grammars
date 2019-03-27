@@ -196,7 +196,6 @@ func (sq sequence) String() string {
 
 type ProgramTree struct {
 	Symbol   *Symbol
-	Parent   *ProgramTree
 	Children []*ProgramTree
 	value    interface{}
 }
@@ -204,7 +203,6 @@ type ProgramTree struct {
 func NewProgramTree(s *Symbol) *ProgramTree {
 	return &ProgramTree{
 		Symbol:   s,
-		Parent:   nil,
 		Children: make([]*ProgramTree, 0),
 		value:    nil,
 	}
@@ -212,9 +210,6 @@ func NewProgramTree(s *Symbol) *ProgramTree {
 
 func (n *ProgramTree) AddChildren(children ...*ProgramTree) {
 	n.Children = append(n.Children, children...)
-	for _, c := range children {
-		c.Parent = n
-	}
 }
 
 func (n *ProgramTree) With(value interface{}) *ProgramTree {
