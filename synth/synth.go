@@ -26,12 +26,9 @@ func (s *Synthesizer) Execute(example Example) {
 	start := dsl.NewProgramTree(s.grammar.GetStart())
 	worklist = append(worklist, start)
 
+	iterLim := 1000000
 	index, maxIndex := 0, 0
 	for index <= maxIndex {
-		if index > 400000 {
-			break
-		}
-
 		target := worklist[index]
 		worklist[index] = nil
 		index++
@@ -46,6 +43,9 @@ func (s *Synthesizer) Execute(example Example) {
 			}
 		}
 
+		if maxIndex >= iterLim {
+			continue
+		}
 		for i := 0; i < len(nonTerminals); i++ {
 			seqs := s.grammar.GetRhs(nonTerminals[i].Symbol)
 			for _, seq := range seqs {
