@@ -27,10 +27,8 @@ func (s *Synthesizer) Execute(example Example) {
 	worklist = append(worklist, start)
 
 	index, maxIndex := 0, 0
-	counterForDebug := 0
 	for index <= maxIndex {
-		counterForDebug++
-		if counterForDebug > 10000 {
+		if index > 400000 {
 			break
 		}
 
@@ -42,7 +40,7 @@ func (s *Synthesizer) Execute(example Example) {
 		if len(nonTerminals) == 0 {
 			for _, completePgm := range s.fillSketch(target, example) {
 				if s.check(completePgm, example) {
-					fmt.Println("Count  =", counterForDebug)
+					fmt.Println("Count  =", index)
 					return
 				}
 			}
