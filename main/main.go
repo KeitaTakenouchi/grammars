@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/KeitaTakenouchi/grammars/dsl"
+	"github.com/KeitaTakenouchi/grammars/synth"
 )
 
 func main() {
@@ -125,6 +126,19 @@ func doExp() {
 	result := evaluator.Eval(nodeS, env)
 	v, _ := result.Value()
 	fmt.Printf("RESULT = %v\n", v)
+
+	filler := func(symbol *dsl.Symbol) []interface{} {
+		var ret []interface{}
+		switch symbol {
+		case cnst:
+			for i := 0; i <= 2; i++ {
+				ret = append(ret, i)
+			}
+		}
+		return ret
+	}
+	synthesizer := synth.NewSynthesizer(gram, evaluator, filler)
+	synthesizer.Execute()
 }
 
 func doSQL() {
